@@ -1,0 +1,3 @@
+# ignore large files, data
+*.mat
+!maskellipse.mat
