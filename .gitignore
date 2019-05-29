@@ -1,3 +1,2 @@
 # ignore large files, data
-*.mat
-!maskellipse.mat
+behavior/*cc_ims.mat
