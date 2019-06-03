@@ -1365,7 +1365,7 @@ figure,
 % noiseIndex(DatIdx(round(rand(1).*10000)));
 
 CONDITION=1
-interval=80;
+interval=200;
 buffer=10;
 clear SNR_IMeye SNR_noise
 subCoutner=0;
@@ -1426,7 +1426,7 @@ for sub=1:subCounter
             %             SNR_temp_band{intermodul}(sub,perm,:)=squeeze(nanmean(PERM_powspctrm(sub,perm,:,[whichNegIdx whichPosIdx]),4));
             
             %
-            SNR_IMeye{intermodul}(sub,perm,:)=SNR_tempZ;%SNR_temp;%whichFreqSignal;%SNR_temp;%
+            SNR_IMeye{intermodul}(sub,perm,:)=SNR_temp;%SNR_temp;%whichFreqSignal;%SNR_temp;%
             
         end
     end
@@ -1577,8 +1577,7 @@ elcfile = 'standard_waveguard64.elc';
 elec = ft_read_sens(elcfile);
 plotcfg.elec=elec;
 
-% #
- addpath('/home/adf/faghelss/Documents/TOOLBOXES/Colormaps')
+% 
 hdmfile = '/home/adf/faghelss/Documents/TOOLBOXES/fieldtrip-20190419/template/headmodel/standard_bem.mat';
 vol = ft_headmodel_asa(hdmfile);
 % 
@@ -1729,7 +1728,7 @@ critP=.025
 counter=0;
 figure,
 
-for whichInter=[1:9]
+for whichInter=[1:3]
 %     if any(size(Features_signal{4}{whichInter})~=size(Features_signal{3}{whichInter}))
 %     Features_signal{4}{whichInter}(1:3,:,:)=[];    
 %     end
@@ -1765,8 +1764,7 @@ for whichInter=[1:9]
        plotcfg.highlightchannel=[];%plotcfg.channel{mask};
        plotcfg.highlightcolor = [0 0 0];
        plotcfg.highlight          = 'yes';
-       plotcfg.highlight=[];
-       plotcfg.style='straight';
+       plotcfg.highlight=[]
 %        cfg.markersymbol
      end
     plotcfg.channel{pmap2<critP};
@@ -1774,9 +1772,9 @@ for whichInter=[1:9]
     Disvector=vector{COND_task}{whichInter};
     freq_bog{1}=freq{2};
     freq_bog{1}.powspctrm=repmat(Disvector',size(freq{2}.powspctrm,1),1,size(freq{2}.powspctrm,3));
-    subplot(3,3,counter),title(Feats_labels{mod(whichInter,3)+1})
-    ft_topoplotER(plotcfg, freq_bog{1}),colormap(jet),title(sprintf('nb sign (bonf) %d',sum(pmap2<.05/62)))
-            set(gca, 'CLim', [-3.5 3.5]);
+    subplot(2,4,counter),title(Feats_labels{mod(whichInter,3)+1})
+    ft_topoplotER(plotcfg, freq_bog{1}),colormap(viri),title(sprintf('nb sign %d',sum(pmap2<.01)))
+            set(gca, 'CLim', [-4 4);
 end
 %% % find(elec_post_ind)
 % DATA1=zeros(size(COND_IM{1}{intermodul}(:,[28:30 61 62])));

@@ -26,7 +26,8 @@ ims=load('/home/adf/faghelss/Documents/miscelllaneous/cc_ims.mat');ff=load('/hom
 %%
 
 subjectN=0;
-for task=1:2
+%for
+ task=2
 tasks_folders={'emotion','gender'};
 task_str=tasks_folders{task};
 
@@ -49,6 +50,9 @@ for subject=1:nSubs
     for block=1:nBlocks
         
         clear cid q
+        
+        sprintf('/ block %d /',block)
+        
         
         load(strcat('Bubbles_SSVEP_',name,'_',task_str,'_',num2str(block),'.mat'))
         
@@ -76,9 +80,7 @@ for subject=1:nSubs
         % Reproduce the noise for each trial and put it in a matrix
         for trial = 1:200
             
-            if mod(trial,100)==0
-                sprintf('// Trial %d  //',trial)
-            end
+
             
             % Creation de bruit
             qteBulles = cid.data(5,trial);
@@ -128,10 +130,11 @@ for subject=1:nSubs
     
     CI_all{task}(subjectN,:,:)=SSP;
     
-    %figure, imagesc(squeeze(sum(CI_all{task}(subjectN,:,:,:),2)/sqrt(nBlocks))), title(sprintf(' subject %s, task %s',name,task_str))
+        
+    figure, imagesc(squeeze((CI_all{task}(subjectN,:,:)))), title(sprintf(' subject %s, task %s',name,task_str))
     
 end
-% % % % %  % % % % %  % % % % %  % % % % % % % % % % % % % % 
+%% % % % %  % % % % %  % % % % %  % % % % % % % % % % % % % % 
 % % % % % compute ROI usage, save per participant % % % % % 
 % load ROI
 mask_file=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/interestregions.mat')
@@ -164,34 +167,35 @@ for subject=1:nSubs
     mean_ROIs = [nanmean(CIs_sub(masks{1})), nanmean(CIs_sub(masks{2})), nanmean(CIs_sub(masks{3}))];
     max_ROIs = [max(CIs_sub(masks{1})), max(CIs_sub(masks{2})), max(CIs_sub(masks{3}))];
     
+    
+    figure, imagesc(squeeze((CI_all{task}(subjectN,:,:)))), title(sprintf(' subject %s, task %s',name,task_str))
+    
     save(fullfile(res_path,filename), 'CIs_sub', 'mean_ROIs', 'max_ROIs','masks')%,'mACC','mRT');
 end
 
 show_ci=squeeze(sum((CI_all{task})))/sqrt(subjectN);
 figure, imagesc(show_ci),colormap(jet)
-end
 %%
-task=1;
+task=2;
 
 
 ims=load('/home/adf/faghelss/Documents/miscelllaneous/cc_ims.mat');ff=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/maskellipse.mat');
 tasks_folders={'emotion','gender'};
 task_str=tasks_folders{task};
+facemask=squeeze(double(ff.facemask(:,:,1)));
 if task==1
     path_data='/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/emotion/raw_data/';
     res_path='/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/emotion/emotion_CIs';
-    face_img_show=stretch(double(squeeze(ims.cc_ims{11})));
+    face_img_show=stretch(double(squeeze(ims.cc_ims{11}))).*facemask;
 else
     path_data='/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/gender/raw_data/';
     res_path='/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/gender/gender_CIs';
-    face_img_show=stretch(double(squeeze(ims.cc_ims{11})));
+    face_img_show=stretch(double(squeeze(ims.cc_ims{11}))).*facemask;
 end
-facemask=squeeze(double(ff.facemask(:,:,1)));
 
 
-
-p = .05;
-tC = 3.2;
+p = .00001;
+tC = 3.0;
 counter=0;
 sigma=15;
 counter=counter+1;
@@ -207,23 +211,29 @@ for subject=1:nSubs
     
     name=info_parts{subject}{1};
     filename = sprintf('CI_%s_%s', name,task_str);
-    load (fullfile(res_path,filename), 'CIs_sub', 'mean_ROIs', 'max_ROIs','masks')
-    CI_all{task}(subjectN,:,:)=CIs_sub;
+    ind=load (fullfile(res_path,filename), 'CIs_sub', 'mean_ROIs', 'max_ROIs','masks')
+    CI_all{task}(subjectN,:,:)=ind.CIs_sub;
+    % Calculate de mean and max
+    mean_ROIs = [nanmean(ind.CIs_sub(masks{1})), nanmean(ind.CIs_sub(masks{2})), nanmean(ind.CIs_sub(masks{3}))];
+    max_ROIs = [max(ind.CIs_sub(masks{1})), max(ind.CIs_sub(masks{2})), max(ind.CIs_sub(masks{3}))];
+    
     all_meanROI_usage{task}(subjectN,:)=(mean_ROIs);all_maxROI_usage{task}(subjectN,:)=(max_ROIs);
     
 end
-% figure, scatter3(all_meanROI_usage{task}(:,1),all_meanROI_usage{task}(:,2),all_meanROI_usage{task}(:,3),'filled'),xlabel('left eye usage'),...
-%     ylabel('right eye usage'),zlabel('mouth usage')
-% hold on
-%  scatter3(all_meanROI_usage{1}(:,1),all_meanROI_usage{1}(:,2),all_meanROI_usage{1}(:,3),'filled'),legend({'gender task','emotion task'})
+figure, scatter3(all_meanROI_usage{task}(:,1),all_meanROI_usage{task}(:,2),all_meanROI_usage{task}(:,3),'filled'),xlabel('left eye usage'),...
+    ylabel('right eye usage'),zlabel('mouth usage')
+hold on
+ scatter3(all_meanROI_usage{1}(:,1),all_meanROI_usage{1}(:,2),all_meanROI_usage{1}(:,3),'filled'),legend({'gender task','emotion task'})
 %
 show_ci=squeeze(sum(CI_all{task}))/sqrt(subjectN);
 
 %,4.3);
 
 [signif_regions]=find_sig_cluster(show_ci,k,tC);
-tmp_range=[min(show_ci(:)) max(show_ci(:))];
+tmp_range=[-3 20];%[min(show_ci(:)) max(show_ci(:))];
 
 show_CI=showDatCi(signif_regions,1,show_ci,jet,face_img_show,tmp_range);
+[complete, thresh]=overlay_pixel(face_img_show,show_ci,tP);
 
-figure, imagesc(show_CI)
+figure, imshow(thresh)
+imwrite(thresh,strcat('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/figures/ClassificationImages/','averageCI_',task_str,'.png'))
