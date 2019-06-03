@@ -7,18 +7,18 @@
 
 %%
 
-task=2;
+task=1;
 
-maskROI=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/interestregions.mat');
-ff=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/maskellipse.mat');
-images=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/cc_ims.mat');
+%maskROI=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/interestregions.mat');
+%ff=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/maskellipse.mat');
+% images=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/cc_ims.mat');
+% 
+% im_avg=zeros(497,497);for im=1:264,im_avg=im_avg+rgb2gray(double(images.cc_ims{im}));end
+% im_avg=im_avg/264;
 
-im_avg=zeros(497,497);for im=1:264,im_avg=im_avg+rgb2gray(double(images.cc_ims{im}));end
-im_avg=im_avg/264;
 
-
-facemask=squeeze(double(ff.facemask(:,:,1)));
-masque=logical(facemask);
+%facemask=squeeze(double(ff.facemask(:,:,1)));
+%masque=logical(facemask);
 
 path_all='/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/';
 if task==1
@@ -43,6 +43,6 @@ for subject=1:nSubs
 end
 show_CI=squeeze(sum(CI_all)/sqrt(subCount));
 
-figure, imagesc(show_CI.*masque),colorbar
+figure, imagesc(show_CI.*SUB.masks{3}),colormap(jet)
 hold on
-contour(show_CI,[5 7 10],'--w')
+contour(show_CI,[5 7],'-w')

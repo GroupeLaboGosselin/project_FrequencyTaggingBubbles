@@ -194,7 +194,7 @@ cid.participant=params.name;
 cid.dataLabels = 'gender_face1 face1_nb face2_nb right_left_flip nb_bubbles overlap_target response RT accuracy simi2target';
 nbColumns = 11;
 
-rng('shuffle')%  rand('state', round(sum(100*clock)));
+seed_1=rng('shuffle')%  rand('state', round(sum(100*clock)));
 
 cid.seed=rng;
 
@@ -476,7 +476,7 @@ end
 % 
 % Screen('FrameRect', w, [10 10 10], bbox+[-20 -20 +20 +20],3);
 % 
-% Screen('DrawText', w, 'Appuyez une touche sur le clavier pour débuter', xCenter-250, ny+50, [0, 100, 100, 255]);
+% Screen('DrawText', w, 'Appuyez une touche sur le clavier pour dï¿½buter', xCenter-250, ny+50, [0, 100, 100, 255]);
 % Screen('Flip',w);
 % WaitSecs(.5);
 % KbWait;

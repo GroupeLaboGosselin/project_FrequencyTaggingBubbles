@@ -1,7 +1,7 @@
 function [CI]=quickCI_BubblesSSVEP(path_data,name,task,blocks)
 
-
-%load('/Users/labogosselin/Documents/LaboUmontreal/SSVEP_Bubbles/stimuli/cc_ims.mat');
+addpath('/home/adf/faghelss/Documents/TOOLBOXES/Stat4CiToolbox/Stat4CiToolbox')
+% load('/Users/labogosselin/Documents/LaboUmontreal/SSVEP_Bubbles/stimuli/cc_ims.mat');
 ff=load('/home/adf/faghelss/Documents/project_FrequencyTaggingBubbles/behavior/maskellipse.mat');
 facemask=squeeze(double(ff.facemask(:,:,1)));
 masque=logical(facemask);
@@ -13,11 +13,10 @@ nTrialsPerBin   = nTrials/nBins;
 thr             = .75; %Threshold for bubbles computation
 
 
-
 p = .05;
 tC = 3;
 counter=0;
-sigma=15;
+sigma=18;
 counter=counter+1;
 FWHM(counter) = sigma * sqrt(8*log(2));
 
@@ -68,15 +67,16 @@ for subject = 1
         
         % Initialize vectors and matrices
         nTrials     = size(cid.data, 2);
+        %%
         X           = zeros(nTrials, sizeX^2);
         y           = zeros(1, nTrials);
         
         % Get the seed from the cid and initialize the rand function
-        %temp        = sscanf(cid.noise, '%s%s%s%s%d');
-        %seed_0      = temp(end);
-
-        rng(cid.seed)%initializing random number generator
+%         temp        = sscanf(cid.noise, '%s%s%s%s%d');
+%         seed_0      = temp(end);
+%         rand('state',seed_0)
         
+        rng(cid.seed)%initializing random number generator
         
         % Reproduce the noise for each trial and put it in a matrix
         for trial = 1:nTrials
@@ -100,7 +100,7 @@ for subject = 1
             
             % Variable dependente
             y(1,trial)  = cid.data(9,trial); % ACCURACY
-            RT(1,trial)  = cid.data(8,trial); % Response Time
+            %RT(1,trial)  = cid.data(8,trial); % Response Time
             
             
             if find(isnan(X(trial,:)))
@@ -111,9 +111,10 @@ for subject = 1
             end
             
         end
+        %%
         % Standardisation de la VD
         y       = (y - mean(y)) / std(y);
-        RT       = -1 * ((RT - mean(RT)) / std(RT));
+       % RT       = -1 * ((RT - mean(RT)) / std(RT));
         
         X_all = [X_all; X;];
         y_all = [y_all y];
@@ -137,7 +138,7 @@ for subject = 1
      h=waitbar(block/nblock, h, sprintf('Image de Classification %s : %3.2f %% complete', name,block/nblock));
      
     %On combine les blocs pour chq sujets..
-    b_all = (y_all) * X_all;
+    b_all = zscore(y_all) * X_all;
     b_2D_all = reshape(b_all, sizeX, sizeX);
   % Bootstrapping the accuracry vector.
   
