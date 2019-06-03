@@ -1332,7 +1332,7 @@ electrodesAll=elecs;
 figure,
  for perm=1:6
      hz_intermod=intermod(Perm(perm,:)',[1 20]);
-  subplot(3,2,perm),plot(freq{Subj(1)}.freq,(squeeze(nanmean(PERM_powspctrm(Subjs_cond,perm,electrodesAll,:))))),axis([ 2 20 0 .15])
+  subplot(3,2,perm),plot(freq{Subj(1)}.freq,nanmean(squeeze(nanmean(PERM_powspctrm(Subjs_cond,perm,electrodesAll,:))))),axis([ 2 20 0 .15])
 %  subplot(3,2,perm),plot(freq{Subj(1)}.freq,squeeze(nanmean(nanmean(PERM_powspctrm(:,perm,electrodesAll,:)),3)),'-k'),axis([ 2 20 0 .2]),title(sprintf('permutation %d',perm))
          hold on
          bar(Perm(perm,1) ,.015,.4,'r'),
@@ -1365,8 +1365,8 @@ figure,
 % noiseIndex(DatIdx(round(rand(1).*10000)));
 
 CONDITION=1
-interval=80;
-buffer=10;
+interval=100;
+buffer=20;
 clear SNR_IMeye SNR_noise
 subCoutner=0;
 for sub=1:subCounter
@@ -1378,7 +1378,7 @@ for sub=1:subCounter
         hz_intermod(1:3)=Perm(perm,:);
         hz_intermod(4:6)=Perm(perm,:).*2;
         hz_intermod(7:9)=Perm(perm,:).*3;
-%             hz_intermod(10:12)=Perm(perm,:).*4;
+        hz_intermod(10:12)=Perm(perm,:).*4;
         
 %             hz_intermod(8)=abs(2*Perm(perm,1)-2*Perm(perm,2));
 %         % % %     hz_intermod(10)=abs(3*Perm(perm,1)-3*Perm(perm,2));
@@ -1389,7 +1389,7 @@ for sub=1:subCounter
         % %     hz_intermod(11)=abs((Perm(perm,1)+Perm(perm,2))-Perm(perm,3));
         % %     hz_intermod(12)=abs((Perm(perm,1)-Perm(perm,2))+Perm(perm,3));
         %     hz_intermod(12)=abs(Perm(perm,1)+2*Perm(perm,2));
-        for intermodul=1:9
+        for intermodul=1:12
 
             FeatFreq_indx = abs(bsxfun(@minus,hz_intermod(intermodul)',freq{subject}.freq));
             [~,index_freqToFeatures] = min(FeatFreq_indx(:,1:size(FeatFreq_indx,2)));
@@ -1408,7 +1408,7 @@ for sub=1:subCounter
             whichFreqNoiseNeg=squeeze(nanmean(nanmean(PERM_powspctrm(sub,perm,:,whichNegIdx),2),3))';
             whichFreqNoisePos=squeeze(nanmean(nanmean(PERM_powspctrm(sub,perm,:,whichPosIdx),2),3))';
             
-            %specific to each electrode
+            %specific to each electrod
             MwhichFreqNoiseNeg=nanmean(squeeze(nanmean(PERM_powspctrm(sub,perm,:,whichNegIdx),2)),2)';
             MwhichFreqNoisePos=nanmean(squeeze(nanmean(PERM_powspctrm(sub,perm,:,whichPosIdx),2)),2)';
             STDwhichFreqNoise=nanstd([squeeze(nanmean(PERM_powspctrm(sub,perm,:,whichPosIdx),2)) squeeze(nanmean(PERM_powspctrm(sub,perm,:,whichPosIdx),2))],0,2);
@@ -1426,7 +1426,7 @@ for sub=1:subCounter
             %             SNR_temp_band{intermodul}(sub,perm,:)=squeeze(nanmean(PERM_powspctrm(sub,perm,:,[whichNegIdx whichPosIdx]),4));
             
             %
-            SNR_IMeye{intermodul}(sub,perm,:)=SNR_tempZ;%SNR_temp;%whichFreqSignal;%SNR_temp;%
+            SNR_IMeye{intermodul}(sub,perm,:)=SNR_temp;%SNR_temp;%whichFreqSignal;%SNR_temp;%
             
         end
     end
@@ -1457,10 +1457,10 @@ whichelecs=elecs;
 whichMeasure=COND_IM
 
 perm=[1:3 5:6];
-whichSubs=[1:20]
+whichSubs=[1:22]
 
 Taggs=Perm(perm,:)
-left_eye=[7]
+left_eye=[1 4 7]
 COND_all_mean=zeros(3,length(whichSubs),64);
 clear ANOVA_COND ANOVA_COND ANOVA_PERM ANOVA_ELEC  ANOVA_HEMIF
 
@@ -1634,14 +1634,14 @@ load ElectrodesMatrices.mat
 clear vector Features_signal
 perm=[1:6]
 
-for ii=1:3,count{ii}=0;end
+
 
 
 for COND_task=1:2
 Feats_labels={'','left eye','right eye','mouth'};
-figure, 
+% figure, 
 counter=0;
-  
+  for ii=1:3,count{ii}=0;end
 if COND_task==1
     subjects_condition=[1:2:22];% need to check participant 21:22 data.
     
@@ -1655,7 +1655,7 @@ end
 %  subjects_condition(3:4)=[]; % need to recompute all subject Laetitia data and trials
  
 
-for whichInter=1:9%[1 2 3]+6
+for whichInter=1:3%[1 2 3]+6
   
     
     counter=counter+1;
@@ -1665,11 +1665,13 @@ for whichInter=1:9%[1 2 3]+6
             count{3}=count{3}+1;
             Features_signal{COND_task+2}{3}(count{3},:,:)=squeeze(nanmean(COND_IM{1}{whichInter}(subjects_condition,perm,:,:),2));
         case 1
-            count{2}=count{2}+1;
-            Features_signal{COND_task+2}{2}(count{2},:,:)=squeeze(nanmean(COND_IM{1}{whichInter}(subjects_condition,perm,:,:),2));
-        case 2
             count{1}=count{1}+1;
+
             Features_signal{COND_task+2}{1}(count{1},:,:)=squeeze(nanmean(COND_IM{1}{whichInter}(subjects_condition,perm,:,:),2));
+        case 2
+            count{2}=count{2}+1
+            whichInter
+            Features_signal{COND_task+2}{2}(count{2},:,:)=squeeze(nanmean(COND_IM{1}{whichInter}(subjects_condition,perm,:,:),2));
     end
        vector{COND_task}{whichInter}=(squeeze(nanmean(nanmean(COND_IM{1}{whichInter}(subjects_condition,perm,:,:)),2)));%+squeeze(nanmean(nanmean(COND_IM{COND}{whichInter}(subj_2,perm,:,:)),2)))/sqrt(2);%-squeeze(nanmean((COND_IM{COND}{whichInter+3}(subj,perm,:,:)),2));
        Disvector=vector{COND_task}{whichInter};%-vector{2}{1};
@@ -1724,39 +1726,39 @@ end
 end
 
 
-%%
+%
 critP=.025
 counter=0;
 figure,
 
-for whichInter=[1:9]
+for whichInter=[1:3]
 %     if any(size(Features_signal{4}{whichInter})~=size(Features_signal{3}{whichInter}))
 %     Features_signal{4}{whichInter}(1:3,:,:)=[];    
 %     end
 %     
     counter=counter+1;
-    clear tmap2 pmap2 stats temp_mat
-    h= waitbar(0, 'ttest 1 : 0 % compl�t�');
-    for ii= 1:64
-        [~,p{ii},~,stats{ii}]=ttest(Features_signal{1}{whichInter}(:,ii),Features_signal{2}{whichInter}(:,ii));
-        tmap2(ii) = stats{ii}.tstat;
-        pmap2(ii)= p{ii};
-        
-        waitbar(ii/6, h, sprintf('ttest : %3.2f %% compl�t�', (ii/64)*100));
-    end
-    delete(h)
-    
-%     temp_mat{1}{whichInter}=squeeze(sum(Features_signal{3}{whichInter})/sqrt(count{whichInter}));
-%     temp_mat{2}{whichInter}=squeeze(sum(Features_signal{4}{whichInter})/sqrt(count{whichInter}));
-%         h= waitbar(0, 'ttest 1 : 0 % compl�t�');
+%     clear tmap2 pmap2 stats temp_mat
+%     h= waitbar(0, 'ttest 1 : 0 % compl�t�');
 %     for ii= 1:64
-%         [~,p{ii},~,stats{ii}]=ttest(temp_mat{1}{whichInter}(:,ii),temp_mat{2}{whichInter}(:,ii));
+%         [~,p{ii},~,stats{ii}]=ttest(Features_signal{1}{whichInter}(:,ii),Features_signal{2}{whichInter}(:,ii));
 %         tmap2(ii) = stats{ii}.tstat;
 %         pmap2(ii)= p{ii};
 %         
 %         waitbar(ii/6, h, sprintf('ttest : %3.2f %% compl�t�', (ii/64)*100));
 %     end
 %     delete(h)
+    
+    temp_mat{1}{whichInter}=squeeze((Features_signal{3}{whichInter}));%/sqrt(count{whichInter}));
+    temp_mat{2}{whichInter}=squeeze((Features_signal{4}{whichInter}));%/sqrt(count{whichInter}));
+        h= waitbar(0, 'ttest 1 : 0 % compl�t�');
+    for ii= 1:64
+        [~,p{ii},~,stats{ii}]=ttest(temp_mat{1}{whichInter}(:,ii),temp_mat{2}{whichInter}(:,ii));
+        tmap2(ii) = stats{ii}.tstat;
+        pmap2(ii)= p{ii};
+        
+        waitbar(ii/6, h, sprintf('ttest : %3.2f %% compl�t�', (ii/64)*100));
+    end
+    delete(h)
 %     
     % figure, imagesc(tmap2),colorbar
     % set(gca,'XTick',1:64,'XTickLabel',freq{2}.label)
@@ -1767,15 +1769,15 @@ for whichInter=[1:9]
        plotcfg.highlight          = 'yes';
        plotcfg.highlight=[];
        plotcfg.style='straight';
-%        cfg.markersymbol
+%      cfg.markersymbol
      end
     plotcfg.channel{pmap2<critP};
     vector{COND_task}{whichInter}=tmap2(:);
     Disvector=vector{COND_task}{whichInter};
     freq_bog{1}=freq{2};
     freq_bog{1}.powspctrm=repmat(Disvector',size(freq{2}.powspctrm,1),1,size(freq{2}.powspctrm,3));
-    subplot(3,3,counter),title(Feats_labels{mod(whichInter,3)+1})
-    ft_topoplotER(plotcfg, freq_bog{1}),colormap(jet),title(sprintf('nb sign (bonf) %d',sum(pmap2<.05/62)))
+    subplot(1,3,counter),title(Feats_labels{mod(whichInter,3)+1})
+    ft_topoplotER(plotcfg, freq_bog{1}),colormap(jet)%,title(sprintf('nb sign (bonf) %d',sum(pmap2<.05/62)))
             set(gca, 'CLim', [-3.5 3.5]);
 end
 %% % find(elec_post_ind)
